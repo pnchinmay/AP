@@ -242,6 +242,7 @@ public class Main {
                         System.out.println(compID +") "+ compName);
                     }
                     System.out.println("Enter company name: ");
+                    sc.nextLine();
                     String name= sc.nextLine();
                     int id = GetCompanyId(admin, name);
                     if(id>0)
@@ -573,7 +574,7 @@ public class Main {
 //			6) Accept Offer
             else if(choice2 == 6) {
                 if(s.OfferedCompany.size()>0) {
-                    int Index = s.HighestCTCCompanyID - 1;
+                    int Index = s.GetOfferedCompanyIndex(admin,s.HighestCTCCompanyID);
                     System.out.println("Congratulations " + s.Name + "!!! You have accepted the offer by " + s.OfferedCompany.get(Index).CompanyName + "!!!");
                     s.Status = "Placed";
                     s.CompanyAcceptedCount++;
@@ -588,9 +589,9 @@ public class Main {
             else if(choice2 == 7) {
                 if(s.OfferedCompany.size()>0) {
                     System.out.println("You have rejected the offer by " + s.OfferedCompany.get(0).CompanyName);
-                    int compId = s.HighestCTCCompanyID;
-                    s.Companies.get(compId - 1).offered = 0;
-                    s.OfferedCompany.remove(0);
+                    int index = s.GetOfferedCompanyIndex(admin,s.HighestCTCCompanyID);
+                    s.Companies.get(index).offered = 0;
+                    s.OfferedCompany.remove(index);
                     s.CompanyRejectedCount++;
                     if (s.CompanyOfferedCount == s.CompanyRejectedCount && s.CompanyAcceptedCount < 1) {
                         s.Status = "Blocked";

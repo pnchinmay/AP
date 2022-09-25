@@ -155,4 +155,15 @@ public class Student {
         }
         return -1;
     }
+
+    public int GetOfferedCompanyIndex(PlacementCellMode admin, int id) {
+        for (int i = 0; i < this.OfferedCompany.size(); i++) {
+            Company object = this.OfferedCompany.get(i);
+            if (object !=null && object.Id == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
 }
