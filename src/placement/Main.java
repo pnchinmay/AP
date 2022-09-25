@@ -88,31 +88,45 @@ public class Main {
 
 //			1) Open Student Registrations
             if(choice==1) {
-                System.out.println("1) Set the Opening Time for Student Registrations");
-                System.out.print("Enter in the format \"18-07-2022-18-45-PM\": ");
-                Date date1;
-//				Input date
-                String s = sc.next();
-                System.out.println("You entered: " + s);
-                try {
-                    date1 = new SimpleDateFormat("dd-MM-yyyy-HH-mm-a").parse(s);
-                    System.out.print("You entered: ");
-                    System.out.println(new SimpleDateFormat("dd-MM-yyyy-HH-mm-a").format(date1));
-                    admin.RegistrationDates[2] = date1;
-                } catch (ParseException e) {
-                    System.out.println("Invalid Date Format\n"
-                            + "Try again in the format 18-07-2022-18-45-PM");
+                if(admin.RegistrationDates[0]==null){
+                    System.out.println("Student registration can't open before company registration ends");
                 }
-                System.out.println("2) Set the Ending Time for Student Registrations");
-                s = sc.next();
-                try {
-                    date1 = new SimpleDateFormat("dd-MM-yyyy-HH-mm-a").parse(s);
-                    System.out.print("You entered: ");
-                    System.out.println(new SimpleDateFormat("dd-MM-yyyy-HH-mm-a").format(date1));
-                    admin.RegistrationDates[3] = date1;
-                } catch (ParseException e) {
-                    System.out.println("Invalid Date Format\n"
-                            + "Try again in the format 18-07-2022-18-45-PM");
+                else {
+                    System.out.println("1) Set the Opening Time for Student Registrations");
+                    System.out.print("Enter in the format \"18-07-2022-18-45-PM\": ");
+                    Date date1;
+                    //				Input date
+                    String s = sc.next();
+                    System.out.println("You entered: " + s);
+                    int flag = 1;
+                    try {
+                        date1 = new SimpleDateFormat("dd-MM-yyyy-HH-mm-a").parse(s);
+                        System.out.print("You entered: ");
+                        System.out.println(new SimpleDateFormat("dd-MM-yyyy-HH-mm-a").format(date1));
+                        if(date1.after(admin.RegistrationDates[1])) {
+                            admin.RegistrationDates[2] = date1;
+                        }
+                        else{
+                            flag = 0;
+                            System.out.println("Student registration date should start after Company registration ends");
+                        }
+                    } catch (ParseException e) {
+                        System.out.println("Invalid Date Format\n"
+                                + "Try again in the format 18-07-2022-18-45-PM");
+                    }
+                    if(flag == 1) {
+                        System.out.println("2) Set the Ending Time for Student Registrations");
+                        s = sc.next();
+                        try {
+                            date1 = new SimpleDateFormat("dd-MM-yyyy-HH-mm-a").parse(s);
+                            System.out.print("You entered: ");
+                            System.out.println(new SimpleDateFormat("dd-MM-yyyy-HH-mm-a").format(date1));
+                            admin.RegistrationDates[3] = date1;
+                        } catch (ParseException e) {
+                            System.out.println("Invalid Date Format\n"
+                                    + "Try again in the format 18-07-2022-18-45-PM");
+                        }
+                    }
                 }
             }
 
@@ -200,7 +214,7 @@ public class Main {
                         String compName = admin.Companies.get(i).CompanyName;
                         System.out.println(compID +") "+ compName);
                     }
-                    System.out.println("Enter compnay name: ");
+                    System.out.println("Enter company name: ");
                     String name= sc.nextLine();
                     int id = GetCompanyId(admin, name);
                     if(id>0)
@@ -374,76 +388,78 @@ public class Main {
 
 //			2) Register for Company
             else if(choice2==2) {
-                if(s.Companies.size()>0) {
-                    System.out.print("Available Companies: ");
-                    for (int i = 0; i < s.Companies.size(); i++) {
-                        Company c = s.Companies.get(i);
-                        int compID = c.Id;
-                        String compName = c.CompanyName;
-                        String compEligibility = c.eligibility;
-                        if (s.CGPA < c.CGPA)
-                            c.eligibility = "Unavailable";
-                        if(c.Registered==1)
-                            System.out.println(compID + ") " + compName + " - " + compEligibility);
-                    }
-                    System.out.print("Enter choice: ");
-
-                    //	Company ID selected
-                    int ch = sc.nextInt();
-
-                    //				Company inside companies arraylist of student object
-                    Company c = s.Companies.get(ch - 1);
-                    if(c.Registered==1) {
-                        String compName = c.CompanyName;
-                        String compRole = c.CompanyRole;
-                        String compEligibility = c.eligibility;
-                        int flag = 0;
-                        if (s.CompanyOfferedCount > 0 && c.Package >= 3 * s.maxPackageOffered)
-                            flag = 1;
-                        else if (s.CompanyOfferedCount == 0)
-                            flag = 1;
-                        if (compEligibility == "Available" && s.Status == "Unplaced" && flag == 1) {
-                            System.out.println("Successfully Registered for " + compRole + " Role at " + compName);
-
-                            //					Updating in companies arraylist of Student object
-                            s.CompanyAppliedCount++;
-                            s.AppliedCompany.add(c);
-                            c.application = "applied";
-
-                            //					Updating student in companies arraylist in admin object
-                            //					Company inside companies arraylist of student object
-                            c = admin.Companies.get(ch - 1);
-                            c.Students.add(s);
-                            c.StudentsRegisteredCount++;
-
-                            //					Company selecting/offering the candidate
-                            if (c.CGPA <= s.CGPA) {
-                                c.StudentsOfferedCount++;
-                                admin.OffersCount++;
-                                admin.Packages.add(c.Package);
-                                int mx = GetCompanyId(admin, c.CompanyName);
-                                s.AppliedCompany.get(mx).offered = 1;
-                                s.SetMaxPackageOffered(s.Id, admin);
-                                for (int i = 0; i < c.StudentsOfferedCount; i++) {
-                                    if (c.Students.get(i).Id == s.Id) {
-                                        c.StudentsOffered.add(s);
-                                        c.StudentsOfferedCount++;
-                                        c.Students.get(i).offered = 1;
-                                        s.CompanyOfferedCount++;
-                                        s.OfferedCompany.add(c);
-                                        break;
-                                    }
-                                }
-                            } else {
-                                System.out.println("Sorry you can't apply for this role");
-                            }
+                if(s.Registered==1) {
+                    if (s.Companies.size() > 0) {
+                        System.out.print("Available Companies: ");
+                        for (int i = 0; i < s.Companies.size(); i++) {
+                            Company c = s.Companies.get(i);
+                            int compID = c.Id;
+                            String compName = c.CompanyName;
+                            String compEligibility = c.eligibility;
+                            if (s.CGPA < c.CGPA)
+                                c.eligibility = "Unavailable";
+                            if (c.Registered == 1)
+                                System.out.println(compID + ") " + compName + " - " + compEligibility);
                         }
-                    }
-                    else
-                        System.out.println("You chose the wrong option");
+                        System.out.print("Enter choice: ");
+
+                        //	Company ID selected
+                        int ch = sc.nextInt();
+
+                        //				Company inside companies arraylist of student object
+                        Company c = s.Companies.get(ch - 1);
+                        if (c.Registered == 1) {
+                            String compName = c.CompanyName;
+                            String compRole = c.CompanyRole;
+                            String compEligibility = c.eligibility;
+                            int flag = 0;
+                            if (s.CompanyOfferedCount > 0 && c.Package >= 3 * s.maxPackageOffered)
+                                flag = 1;
+                            else if (s.CompanyOfferedCount == 0)
+                                flag = 1;
+                            if (compEligibility == "Available" && s.Status == "Unplaced" && flag == 1) {
+                                System.out.println("Successfully Registered for " + compRole + " Role at " + compName);
+
+                                //					Updating in companies arraylist of Student object
+                                s.CompanyAppliedCount++;
+                                s.AppliedCompany.add(c);
+                                c.application = "applied";
+
+                                //					Updating student in companies arraylist in admin object
+                                //					Company inside companies arraylist of student object
+                                c = admin.Companies.get(ch - 1);
+                                c.Students.add(s);
+                                c.StudentsRegisteredCount++;
+
+                                //					Company selecting/offering the candidate
+                                if (c.CGPA <= s.CGPA) {
+                                    c.StudentsOfferedCount++;
+                                    admin.OffersCount++;
+                                    admin.Packages.add(c.Package);
+                                    int mx = GetCompanyId(admin, c.CompanyName);
+                                    s.AppliedCompany.get(mx).offered = 1;
+                                    s.SetMaxPackageOffered(s.Id, admin);
+                                    for (int i = 0; i < c.StudentsOfferedCount; i++) {
+                                        if (c.Students.get(i).Id == s.Id) {
+                                            c.StudentsOffered.add(s);
+                                            c.StudentsOfferedCount++;
+                                            c.Students.get(i).offered = 1;
+                                            s.CompanyOfferedCount++;
+                                            s.OfferedCompany.add(c);
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    System.out.println("Sorry you can't apply for this role");
+                                }
+                            }
+                        } else
+                            System.out.println("You chose the wrong option");
+                    } else
+                        System.out.println("Companies not available");
                 }
                 else
-                    System.out.println("Companies not available");
+                    System.out.println("You have not registered for placements");
             }
 
 //			3) Get all available companies
@@ -614,7 +630,7 @@ public class Main {
 //	Main function
 
     //	Main function
-    public static void main (String argsj[]) {
+    public static void main (String args[]) {
 
 //		PlacementCellMode class object - only one
         PlacementCellMode admin=new PlacementCellMode();
