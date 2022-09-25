@@ -433,8 +433,8 @@ public class Main {
                             int compID = c.Id;
                             String compName = c.CompanyName;
                             String compEligibility = c.eligibility;
-                            if (s.CGPA < c.CGPA)
-                                c.eligibility = "Unavailable";
+                            if (s.CGPA >= c.CGPA)
+                                c.eligibility = "Available";
                             if (c.Registered == 1)
                                 System.out.println(compID + ") " + compName + " - " + compEligibility);
                         }
@@ -468,13 +468,14 @@ public class Main {
                                 c.Students.add(s);
                                 c.StudentsRegisteredCount++;
 
-                                //					Company selecting/offering the candidate
+                                //Company selecting/offering the candidate
                                 if (c.CGPA <= s.CGPA) {
                                     c.StudentsOfferedCount++;
                                     admin.OffersCount++;
                                     admin.Packages.add(c.Package);
                                     int mx = s.GetAppliedCompanyIndex(admin, s.Id);
-                                    s.AppliedCompany.get(mx-1).offered = 1;
+                                    s.AppliedCompany.get(mx).offered = 1;
+                                    s.Companies.get(c.Id-1).application="Applied";
                                     s.SetMaxPackageOffered(s.Id, admin);
                                     for (int i = 0; i < c.StudentsOfferedCount; i++) {
                                         if (c.Students.get(i).Id == s.Id) {
@@ -490,6 +491,8 @@ public class Main {
                                     System.out.println("Sorry you can't apply for this role");
                                 }
                             }
+                            else
+                                System.out.println("You couldn't register for the role");
                         } else
                             System.out.println("You chose the wrong option");
                     } else
@@ -510,7 +513,7 @@ public class Main {
                         String compEligibility = c.eligibility;
                         if (s.CGPA == 0) {
                             System.out.println("");
-                            //						System.out.println("Update your CGPA");
+//                          System.out.println("Update your CGPA");
                         } else if (s.CGPA >= c.CGPA)
                             c.eligibility = "Available";
                         else ;

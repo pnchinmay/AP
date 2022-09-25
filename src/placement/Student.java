@@ -76,6 +76,8 @@ public class Student {
                             + "CGPA: " + this.CGPA + "\n"
                             + "Branch: " + this.Branch + "\n");
                 }
+                else
+                    System.out.println("You aren't registered. Check dates again");
             } catch (ParseException e) {
                 System.out.println("Invalid Date Format\n"
                         + "Try again in the format 18-07-2022-18-45-PM");
