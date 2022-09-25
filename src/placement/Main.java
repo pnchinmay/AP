@@ -38,6 +38,8 @@ public class Main {
                         System.out.println("No such students present");
                     }
                 }
+                else
+                    System.out.println("No student data present");
             }
 
 //			2) Add students
@@ -89,7 +91,10 @@ public class Main {
 
 //			1) Open Student Registrations
             if(choice==1) {
-                if(admin.RegistrationDates[0]==null){
+                if(admin.RegistrationDates[2]!=null){
+                    System.out.println("Student registration dates are set!!");
+                }
+                else if(admin.RegistrationDates[0]==null){
                     System.out.println("Student registration can't open before company registration ends");
                 }
                 else {
@@ -122,7 +127,13 @@ public class Main {
                             date1 = new SimpleDateFormat("dd-MM-yyyy-HH-mm-a").parse(s);
                             System.out.print("You entered: ");
                             System.out.println(new SimpleDateFormat("dd-MM-yyyy-HH-mm-a").format(date1));
-                            admin.RegistrationDates[3] = date1;
+                            if(date1.after(admin.RegistrationDates[2])) {
+                                admin.RegistrationDates[3] = date1;
+                            }
+                            else{
+                                admin.RegistrationDates[2] = null;
+                                System.out.println("Student registration ending date should be after student registration start date");
+                            }
                         } catch (ParseException e) {
                             System.out.println("Invalid Date Format\n"
                                     + "Try again in the format 18-07-2022-18-45-PM");
@@ -133,31 +144,43 @@ public class Main {
 
 //			2) Open Company Registrations
             else if(choice==2) {
-                System.out.println("1) Set the Opening Time for Company Registrations");
-                System.out.print("Enter in the format \"18-07-2022-18-45-PM\": ");
-                Date date1;
-//				Input date
-                String s = sc.next();
-                System.out.println("You entered: " + s);
-                try {
-                    date1 = new SimpleDateFormat("dd-MM-yyyy-HH-mm-a").parse(s);
-                    System.out.print("You entered: ");
-                    System.out.println(new SimpleDateFormat("dd-MM-yyyy-HH-mm-a").format(date1));
-                    admin.RegistrationDates[0] = date1;
-                } catch (ParseException e) {
-                    System.out.println("Invalid Date Format\n"
-                            + "Try again in the format 18-07-2022-18-45-PM");
+                if(admin.RegistrationDates[0]!=null){
+                    System.out.println("Company registration dates are set!!");
                 }
-                System.out.println("2) Set the Ending Time for Company Registrations");
-                s = sc.next();
-                try {
-                    date1 = new SimpleDateFormat("dd-MM-yyyy-HH-mm-a").parse(s);
-                    System.out.print("You entered: ");
-                    System.out.println(new SimpleDateFormat("dd-MM-yyyy-HH-mm-a").format(date1));
-                    admin.RegistrationDates[1] = date1;
-                } catch (ParseException e) {
-                    System.out.println("Invalid Date Format\n"
-                            + "Try again in the format 18-07-2022-18-45-PM");
+                else {
+                    System.out.println("1) Set the Opening Time for Company Registrations");
+                    System.out.print("Enter in the format \"18-07-2022-18-45-PM\": ");
+                    Date date1;
+                    //				Input date
+                    String s = sc.next();
+                    System.out.println("You entered: " + s);
+                    try {
+                        date1 = new SimpleDateFormat("dd-MM-yyyy-HH-mm-a").parse(s);
+                        System.out.print("You entered: ");
+                        System.out.println(new SimpleDateFormat("dd-MM-yyyy-HH-mm-a").format(date1));
+                        admin.RegistrationDates[0] = date1;
+                    } catch (ParseException e) {
+                        System.out.println("Invalid Date Format\n"
+                                + "Try again in the format 18-07-2022-18-45-PM");
+                    }
+                    System.out.println("2) Set the Ending Time for Company Registrations");
+                    s = sc.next();
+                    try {
+                        date1 = new SimpleDateFormat("dd-MM-yyyy-HH-mm-a").parse(s);
+                        System.out.print("You entered: ");
+                        System.out.println(new SimpleDateFormat("dd-MM-yyyy-HH-mm-a").format(date1));
+                        if(date1.after(admin.RegistrationDates[0])) {
+                            admin.RegistrationDates[1] = date1;
+                        }
+                        else{
+                            admin.RegistrationDates[0] = null;
+                            System.out.println("Student registration ending date should be after student registration start date");
+                        }
+                        admin.RegistrationDates[1] = date1;
+                    } catch (ParseException e) {
+                        System.out.println("Invalid Date Format\n"
+                                + "Try again in the format 18-07-2022-18-45-PM");
+                    }
                 }
             }
 
@@ -279,7 +302,7 @@ public class Main {
         Scanner sc=new Scanner(System.in);
 
         while(true) {
-            System.out.println("Choose the Company Query to perform-"
+            System.out.println("Choose the Company Query to perform-\n"
                     + "1) Add Company and Details \n"
                     + "2) Choose Company \n"
                     + "3) Get Available Companies \n"
@@ -450,8 +473,8 @@ public class Main {
                                     c.StudentsOfferedCount++;
                                     admin.OffersCount++;
                                     admin.Packages.add(c.Package);
-                                    int mx = GetCompanyId(admin, c.CompanyName);
-                                    s.AppliedCompany.get(mx).offered = 1;
+                                    int mx = s.GetAppliedCompanyIndex(admin, s.Id);
+                                    s.AppliedCompany.get(mx-1).offered = 1;
                                     s.SetMaxPackageOffered(s.Id, admin);
                                     for (int i = 0; i < c.StudentsOfferedCount; i++) {
                                         if (c.Students.get(i).Id == s.Id) {
@@ -655,7 +678,7 @@ public class Main {
         while(true) {
             System.out.println("Welcome to FutureBuilder: \n"
                     + "1. Enter the Application \n"
-                    + "2. Exit the Application) \n");
+                    + "2. Exit the Application \n");
 
             int choice=sc.nextInt();
 

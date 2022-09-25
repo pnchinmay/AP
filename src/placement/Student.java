@@ -143,4 +143,14 @@ public class Student {
                 x.HighestCTCCompanyID = i+1;
         }
     }
+
+    public int GetAppliedCompanyIndex(PlacementCellMode admin, int id) {
+        for (int i = 0; i < this.AppliedCompany.size(); i++) {
+            Company object = this.AppliedCompany.get(i);
+            if (object !=null && object.Id == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
 }
