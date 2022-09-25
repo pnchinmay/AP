@@ -14,9 +14,10 @@ public class Main {
         Scanner sc=new Scanner(System.in);
 
         while(true) {
-            System.out.println("1) Enter as a Student(Give Student Name, and Roll No.) \n"
+            System.out.println("Choose the Student Query to perform: \n"
+                    + "1) Enter as a Student(Give Student Name, and Roll No.) \n"
                     + "2) Add students \n"
-                    + "3) Back \n");
+                    + "3) Back");
 
             int choice=sc.nextInt();
 			sc.nextLine();
@@ -24,18 +25,18 @@ public class Main {
 
 //			1) Enter as a student (Give Student Name and Roll No.)
             if(choice==1) {
-                System.out.println("Enter name: \n");
-                String name= sc.nextLine();
-                System.out.println("Enter rollNo: ");
-                String RollNo = sc.next();
-                int Id = GetStudentId(admin, RollNo);
-                if(Id>0) {
-                    Student s = admin.Students.get(Id-1);
-                    SingleStudentOptions(admin, Id);
-                }
-                else {
-                    StudentMode s = new StudentMode(name, RollNo);
-                    s.SetDetails(admin);
+                if(admin.StudentCount>0) {
+                    System.out.println("Enter name: ");
+                    String name = sc.nextLine();
+                    System.out.println("Enter rollNo: ");
+                    String RollNo = sc.next();
+                    int Id = GetStudentId(admin, RollNo);
+                    if (Id > 0) {
+                        Student s = admin.Students.get(Id - 1);
+                        SingleStudentOptions(admin, Id);
+                    } else {
+                        System.out.println("No such students present");
+                    }
                 }
             }
 
@@ -179,30 +180,33 @@ public class Main {
 
 //			6) Get Student Details
             else if(choice==6) {
-                System.out.println("Enter student's name and rollNo: ");
-                String name = sc.next();
-                String rollNo = sc.next();
-                int i = GetStudentId(admin, rollNo);
-                i--;
-                Student s = admin.Students.get(i);
-                System.out.println("Student Details are:\n"
-                        + "Student Name: " + s.Name + "\n"
-                        + "Student RollNo: " + s.RollNo + "\n"
-                        + "Student CGPA: " + s.CGPA + "\n"
-                        + "Student Branch: " + s.Branch + "\n"
-                        + "Companies Applied for: " + s.AppliedCompany.size());
-                for(i=0; i<s.AppliedCompany.size(); i++) {
-                    Company c = s.AppliedCompany.get(i);
-                    System.out.println("\n" + c.Id +") CompanyName: "+ c.CompanyName
-                            + "\n  Company role offering: " + c.CompanyRole
-                            + "\n  Company Package: " + c.Package + " LPA"
-                            + "\n  Company CGPA Criteria: " + c.CGPA + "\n");
-                    if(s.AppliedCompany.get(i).offered == 1)
-                        System.out.println("\n Offered: yes");
-                    else
-                        System.out.println("\n Offered: no");
+                if(admin.StudentCount>0) {
+                    System.out.println("Enter student's name and rollNo: ");
+                    String name = sc.next();
+                    String rollNo = sc.next();
+                    int i = GetStudentId(admin, rollNo);
+                    i--;
+                    Student s = admin.Students.get(i);
+                    System.out.println("Student Details are:\n"
+                            + "Student Name: " + s.Name + "\n"
+                            + "Student RollNo: " + s.RollNo + "\n"
+                            + "Student CGPA: " + s.CGPA + "\n"
+                            + "Student Branch: " + s.Branch + "\n"
+                            + "Companies Applied for: " + s.AppliedCompany.size());
+                    for (i = 0; i < s.AppliedCompany.size(); i++) {
+                        Company c = s.AppliedCompany.get(i);
+                        System.out.println("\n" + c.Id + ") CompanyName: " + c.CompanyName
+                                + "\n  Company role offering: " + c.CompanyRole
+                                + "\n  Company Package: " + c.Package + " LPA"
+                                + "\n  Company CGPA Criteria: " + c.CGPA + "\n");
+                        if (s.AppliedCompany.get(i).offered == 1)
+                            System.out.println("\n Offered: yes");
+                        else
+                            System.out.println("\n Offered: no");
+                    }
                 }
-
+                else
+                    System.out.println("No students to show");
             }
 
 //			7) Get Company Details
@@ -222,31 +226,41 @@ public class Main {
                     else
                         System.out.println("No such company present");
                 }
+                else
+                    System.out.println("No companies to show");
             }
 
 //			8) Get Average Package
             else if(choice==8) {
-                float sum = 0;
-                for(int i =0; i<admin.Packages.size(); i++) {
-                    sum += admin.Packages.get(i);
+                if(admin.Packages.size()>0) {
+                    float sum = 0;
+                    for (int i = 0; i < admin.Packages.size(); i++) {
+                        sum += admin.Packages.get(i);
+                    }
+                    float AvgPackage = sum / admin.Packages.size();
+                    System.out.println(AvgPackage);
                 }
-                float AvgPackage = sum/admin.Packages.size();
-                System.out.println(AvgPackage);
+                else
+                    System.out.println("No packages offered yet");
             }
 
 //			9) Get Company Process Results
             else if(choice==9) {
-                String company = sc.next();
-                int compId = GetCompanyId(admin, company);
-                Company c = admin.Companies.get(compId-1);
-                for(int i=0; i<c.StudentsOffered.size(); i++) {
-                    Student selected = c.StudentsOffered.get(i);
-                    int j = i+1;
-                    System.out.println(j + ") Student Name: " + selected.Name + "\n"
-                            + "Student RollNo: " + selected.RollNo + "\n"
-                            + "Student CGPA: " + selected.CGPA + "\n"
-                            + "Student Branch: " + selected.Branch + "\n");
+                if(admin.Companies.size()>0) {
+                    String company = sc.next();
+                    int compId = GetCompanyId(admin, company);
+                    Company c = admin.Companies.get(compId - 1);
+                    for (int i = 0; i < c.StudentsOffered.size(); i++) {
+                        Student selected = c.StudentsOffered.get(i);
+                        int j = i + 1;
+                        System.out.println(j + ") Student Name: " + selected.Name + "\n"
+                                + "Student RollNo: " + selected.RollNo + "\n"
+                                + "Student CGPA: " + selected.CGPA + "\n"
+                                + "Student Branch: " + selected.Branch + "\n");
+                    }
                 }
+                else
+                    System.out.println("No companies present");
             }
 
 //			10) Back

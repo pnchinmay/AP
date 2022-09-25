@@ -15,13 +15,6 @@ public class StudentMode {
     public StudentMode() {
     }
 
-    //	Constructor with name and rollno
-    public StudentMode(String name,String RollNo) {
-        this.name=name;
-        this.RollNo=RollNo;
-    }
-
-
 	public StudentMode(String name,String RollNo,float CGPA,String Branch) {
 		this.name=name;
 		this.RollNo=RollNo;
